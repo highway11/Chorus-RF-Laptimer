@@ -29,6 +29,7 @@ public class RaceResultFragment extends Fragment {
     private RaceResultsListAdapter mAdapter;
     private boolean mIsStartingRace = false;
     private Handler mRaceStartingHandler;
+    private Handler mTimedRaceHandler;
 
     public RaceResultFragment() {
         mRaceStartingHandler = new Handler() {
@@ -38,6 +39,12 @@ public class RaceResultFragment extends Fragment {
                     //last beep
                     AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_GO);
                     AppState.getInstance().sendBtCommand("R*R");
+                    //start timed race if option is checked
+                    if (AppState.getInstance().isTimedRace) {
+                        double timedRaceSeconds = AppState.getInstance().timedRaceTime * 60000;
+                        mTimedRaceHandler.sendEmptyMessage((int) timedRaceSeconds);
+                    }
+
                 } else {
                     this.sendEmptyMessageDelayed(counter - 1, 1000);
                     //first 3 beeps
@@ -46,6 +53,42 @@ public class RaceResultFragment extends Fragment {
                     }
                 }
             }
+        };
+
+        mTimedRaceHandler = new Handler () {
+            public void handleMessage(Message msg) {
+                int interval = msg.what;
+                if (interval == 1) {
+                    AppState.getInstance().speakMessage("1 minute remaining");
+                    this.sendEmptyMessageDelayed(30,30000);
+
+                }
+                else if (interval == 30) {
+                    AppState.getInstance().speakMessage("30 seconds remaining");
+                    this.sendEmptyMessageDelayed(10,20000);
+                }
+                else if (interval == 10) {
+                    AppState.getInstance().speakMessage("10 seconds remaining");
+                    this.sendEmptyMessageDelayed(0,10000);
+                }
+                else if (interval == 0) {
+                    AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_GO);
+                    AppState.getInstance().speakMessage("Race is Finished. Finish your current lap and land in the designated area.");
+
+                }
+                else {
+                    //send first voice alert 1 minute before race ends
+                    double dbl_interval = (double) interval;
+                    double mins = dbl_interval / 60000;
+                    AppState.getInstance().speakMessage("Starting" + String.valueOf(mins) + " minute race");
+                    int next_interval = interval - 60000;
+                    this.sendEmptyMessageDelayed(1, next_interval );
+
+                }
+
+
+            }
+
         };
     }
 
@@ -168,6 +211,7 @@ public class RaceResultFragment extends Fragment {
                     AppState.getInstance().sendBtCommand("R*r");
                     AppState.getInstance().sendBtCommand("R*V");
                     AppState.getInstance().speakMessage("Race is finished");
+                    mTimedRaceHandler.removeCallbacksAndMessages(null);
                     return true;
                 } else if (mIsStartingRace) {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions

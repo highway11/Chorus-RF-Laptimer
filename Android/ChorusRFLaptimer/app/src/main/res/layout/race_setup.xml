@@ -287,5 +287,81 @@
         </LinearLayout>
 
     </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Timed Race"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView10"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal">
+
+            <CheckBox
+                android:layout_height="50dp"
+                android:id="@+id/chkTimedRace"
+                android:checked="false"
+                android:layout_width="wrap_content"
+                android:gravity="center_vertical|center_horizontal" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Timed Race Length"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView11"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button
+                android:text="-"
+                android:layout_height="50dp"
+                android:id="@+id/btnDecRaceTime"
+                android:layout_width="50dp"
+                android:textStyle="normal|bold" />
+
+            <TextView
+                android:text="2 minutes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtRaceTime"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+            <Button
+                android:text="+"
+                android:layout_height="50dp"
+                android:id="@+id/btnIncRaceTime"
+                android:layout_width="50dp"
+                android:textStyle="normal|bold" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -59,7 +59,7 @@ uint8_t MODULE_ID_HEX = '0';
 #include "rx5808spi.h"
 #include "sounds.h"
 
-#define BAUDRATE 115200
+#define BAUDRATE 9600
 
 const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 };
 
@@ -643,7 +643,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 break;
             case CONTROL_GET_VOLTAGE: //get battery voltage
                 voltage = readVoltage();
-                addToSendQueue(SEND_VOLTAGE);
+                //addToSendQueue(SEND_VOLTAGE);
                 break;
             case CONTROL_DATA_REQUEST: // request all data
                 addToSendQueue(SEND_ALL_DEVICE_STATE);

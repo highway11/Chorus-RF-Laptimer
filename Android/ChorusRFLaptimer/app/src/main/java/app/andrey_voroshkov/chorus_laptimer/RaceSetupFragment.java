@@ -55,6 +55,7 @@ public class RaceSetupFragment extends Fragment {
         updateSoundCheckbox(rootView);
         updateSpeakLapTimesCheckbox(rootView);
         updateSpeakMessagesCheckbox(rootView);
+        updateTimedRaceCheckbox(rootView);
 
         AppState.getInstance().addListener(new IDataListener() {
             @Override
@@ -63,6 +64,9 @@ public class RaceSetupFragment extends Fragment {
                     case RaceMinLap:
                     case RaceLaps:
                     case PreparationTime:
+                        updateText(rootView);
+                        break;
+                    case TimedRaceTime:
                         updateText(rootView);
                         break;
                     case SoundEnable:
@@ -77,6 +81,9 @@ public class RaceSetupFragment extends Fragment {
                     case SpeakMessages:
                         updateSpeakMessagesCheckbox(rootView);
                         break;
+                    case TimedRace:
+                        updateTimedRaceCheckbox(rootView);
+                        break;
                     case BatteryPercentage:
                         updateBatteryProgressIndicator(rootView);
                         break;
@@ -88,12 +95,15 @@ public class RaceSetupFragment extends Fragment {
         Button btnIncMLT = (Button) rootView.findViewById(R.id.btnIncMinLapTime);
         Button btnDecLaps = (Button) rootView.findViewById(R.id.btnDecLaps);
         Button btnIncLaps = (Button) rootView.findViewById(R.id.btnIncLaps);
+        Button btnDecRaceTime = (Button) rootView.findViewById(R.id.btnDecRaceTime);
+        Button btnIncRaceTime = (Button) rootView.findViewById(R.id.btnIncRaceTime);
         Button btnDecPrepTime = (Button) rootView.findViewById(R.id.btnDecPreparationTime);
         Button btnIncPrepTime = (Button) rootView.findViewById(R.id.btnIncPreparationTime);
         CheckBox chkSkipFirstLap = (CheckBox) rootView.findViewById(R.id.chkSkipFirstLap);
         CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
         CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
         CheckBox chkDeviceSoundEnabled = (CheckBox) rootView.findViewById(R.id.chkDeviceSoundEnabled);
+        CheckBox chkTimedRace = (CheckBox) rootView.findViewById(R.id.chkTimedRace);
 
         btnDecMLT.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +151,8 @@ public class RaceSetupFragment extends Fragment {
             }
         });
 
+
+
         chkDeviceSoundEnabled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,6 +195,55 @@ public class RaceSetupFragment extends Fragment {
             }
         });
 
+        chkTimedRace.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AppState.getInstance().changeTimedRace(isChecked);
+            }
+        });
+
+        btnDecRaceTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double time = AppState.getInstance().timedRaceTime;
+                double new_time = time;
+                if (time == 1.5)
+                {
+                    new_time = 1;
+                }
+                if (time == 2)
+                {
+                    new_time = 1.5;
+                }
+                if(time == 2.5)
+                {
+                    new_time = 2;
+                }
+                AppState.getInstance().changeTimedRaceTime(new_time);
+            }
+        });
+
+        btnIncRaceTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double time = AppState.getInstance().timedRaceTime;
+                double new_time = time;
+                if (time == 1)
+                {
+                    new_time = 1.5;
+                }
+                if (time == 1.5)
+                {
+                    new_time = 2;
+                }
+                if(time == 2)
+                {
+                    new_time = 2.5;
+                }
+                AppState.getInstance().changeTimedRaceTime(new_time);
+            }
+        });
+
         return rootView;
     }
 
@@ -195,6 +256,9 @@ public class RaceSetupFragment extends Fragment {
 
         TextView txtPreparationTime = (TextView) rootView.findViewById(R.id.txtPreparationTime);
         txtPreparationTime.setText(Integer.toString(AppState.getInstance().timeToPrepareForRace) + " sec.");
+
+        TextView txtRaceTime = (TextView) rootView.findViewById(R.id.txtRaceTime);
+        txtRaceTime.setText(Double.toString(AppState.getInstance().timedRaceTime) + " min.");
     }
 
     private void updateSkipFirstLapCheckbox(View rootView) {
@@ -215,6 +279,11 @@ public class RaceSetupFragment extends Fragment {
     private void updateSpeakMessagesCheckbox(View rootView) {
         CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
         chkSpeakMessages.setChecked(AppState.getInstance().shouldSpeakMessages);
+    }
+
+    private void updateTimedRaceCheckbox(View rootView) {
+        CheckBox chkTimedRace = (CheckBox) rootView.findViewById(R.id.chkTimedRace);
+        chkTimedRace.setChecked(AppState.getInstance().isTimedRace);
     }
 
     private void updateBatteryProgressIndicator(View rootView) {

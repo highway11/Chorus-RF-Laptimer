@@ -22,6 +22,8 @@ public enum DataAction {
     DeviceRSSI,
     SpeakMessages,
     SpeakLapTimes,
+    TimedRace,
+    TimedRaceTime,
     PreparationTime,
     PilotEnabledDisabled,
     SPECIAL_DevicePilot_EditUpdate,

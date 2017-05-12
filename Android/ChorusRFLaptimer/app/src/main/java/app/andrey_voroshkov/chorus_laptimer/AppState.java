@@ -24,6 +24,7 @@ public class AppState {
     public static final int DEFAULT_MIN_LAP_TIME = 5;
     public static final int DEFAULT_LAPS_TO_GO = 3;
 
+
     //tone sounds and durations (race start, lap count, etc)
     public static final int TONE_PREPARE = ToneGenerator.TONE_DTMF_1;
     public static final int DURATION_PREPARE = 80;
@@ -58,6 +59,8 @@ public class AppState {
     public int numberOfDevices = 0;
     public boolean isDeviceSoundEnabled = false;
     public boolean shouldSpeakLapTimes = true;
+    public boolean isTimedRace = false;
+    public double timedRaceTime = 2;
     public boolean shouldSpeakMessages = true;
     public boolean shouldSkipFirstLap = true;
     public boolean wereDevicesConfigured = false;
@@ -533,6 +536,25 @@ public class AppState {
             shouldSpeakMessages = shouldSpeak;
             emitEvent(DataAction.SpeakMessages);
             AppPreferences.save(AppPreferences.SPEAK_MESSAGES);
+        }
+    }
+
+    public void changeTimedRace(boolean isTimed) {
+        if (isTimedRace != isTimed) {
+            isTimedRace = isTimed;
+            emitEvent(DataAction.TimedRace);
+            AppPreferences.save(AppPreferences.TIMED_RACE);
+        }
+    }
+
+    public void changeTimedRaceTime(double time) {
+        if (time < 0) {
+            return;
+        }
+        if (timedRaceTime != time) {
+            timedRaceTime = time;
+            emitEvent(DataAction.TimedRaceTime);
+            AppPreferences.save(AppPreferences.TIMED_RACE_TIME);
         }
     }
 
