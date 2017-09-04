@@ -23,6 +23,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 1: return ChannelsSetupFragment.newInstance(position + 1);
             case 2: return PilotsSetupFragment.newInstance(position + 1);
             case 3: return RaceResultFragment.newInstance(position + 1);
+            case 4: return PilotsSetupFragment.newInstance(position + 1);
         }
         return null;
     }
@@ -30,7 +31,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // Show 3 total pages.
-        return 4;
+        return 5;
     }
 
     @Override
@@ -44,6 +45,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return "Pilots";
             case 3:
                 return "Race";
+            case 4:
+                return "Groups";
         }
         return null;
     }

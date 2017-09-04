@@ -3,6 +3,9 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -24,8 +27,17 @@ public class RaceSetupFragment extends Fragment {
 
     private View mRootView;
     private Context mContext;
+    private Handler mSessionHandler;
+    public boolean isSessionStarted = false;
+    public CountDownTimer timer;
+
+
 
     public RaceSetupFragment() {
+
+
+
+
 
     }
 
@@ -57,6 +69,9 @@ public class RaceSetupFragment extends Fragment {
         updateLiPoMonitorCheckbox(rootView);
         updateBatteryProgressIndicator(rootView);
 
+
+
+
         AppState.getInstance().addListener(new IDataListener() {
             @Override
             public void onDataChange(DataAction dataItemName) {
@@ -70,6 +85,8 @@ public class RaceSetupFragment extends Fragment {
                     case TimedRaceTime:
                         updateText(rootView);
                         break;
+                    case SessionTime:
+                        updateText(rootView);
                     case SoundEnable:
                         updateSoundCheckbox(rootView);
                         break;
@@ -102,6 +119,10 @@ public class RaceSetupFragment extends Fragment {
         Button btnIncLaps = (Button) rootView.findViewById(R.id.btnIncLaps);
         Button btnDecRaceTime = (Button) rootView.findViewById(R.id.btnDecRaceTime);
         Button btnIncRaceTime = (Button) rootView.findViewById(R.id.btnIncRaceTime);
+        Button btnDecSessionTime = (Button) rootView.findViewById(R.id.btnDecSessionTime);
+        Button btnIncSessionTime = (Button) rootView.findViewById(R.id.btnIncSessionTime);
+        Button btnStartSession = (Button) rootView.findViewById(R.id.btnStartSession);
+        Button btnEndSession = (Button) rootView.findViewById(R.id.btnEndSession);
         Button btnDecPrepTime = (Button) rootView.findViewById(R.id.btnDecPreparationTime);
         Button btnIncPrepTime = (Button) rootView.findViewById(R.id.btnIncPreparationTime);
         CheckBox chkSkipFirstLap = (CheckBox) rootView.findViewById(R.id.chkSkipFirstLap);
@@ -113,6 +134,86 @@ public class RaceSetupFragment extends Fragment {
         Button btnDecAdjust = (Button) rootView.findViewById(R.id.btnDecAdjustmentConst);
         Button btnIncAdjust = (Button) rootView.findViewById(R.id.btnIncAdjustmentConst);
         TextView txtVoltage = (TextView) rootView.findViewById(R.id.txtVoltage);
+        TextView txtTimer = (TextView) rootView.findViewById(R.id.txtTimer);
+
+
+
+        mSessionHandler = new Handler () {
+            public void handleMessage(Message msg) {
+                int interval = msg.what;
+                if (interval == 5) {
+                    AppState.getInstance().speakMessage("5 minutes remaining for this group");
+                    this.sendEmptyMessageDelayed(4,60000);
+
+                }
+                else if (interval == 4) {
+                    AppState.getInstance().speakMessage("4 minutes remaining for this group");
+                    this.sendEmptyMessageDelayed(3,60000);
+                }
+                else if (interval == 3) {
+                    AppState.getInstance().speakMessage("3 minutes remaining for this group");
+                    this.sendEmptyMessageDelayed(2,60000);
+                }
+                else if (interval == 2) {
+                    AppState.getInstance().speakMessage("2 minutes remaining for this group");
+                    this.sendEmptyMessageDelayed(1,60000);
+                }
+                else if (interval == 1) {
+                    AppState.getInstance().speakMessage("1 minute remaining for this group");
+                    this.sendEmptyMessageDelayed(30,30000);
+
+                }
+                else if (interval == 30) {
+                    AppState.getInstance().speakMessage("30 seconds remaining for this group. Please land and power off now. ");
+                    this.sendEmptyMessageDelayed(11,30000);
+                }
+                else if (interval == 11) {
+                    AppState.getInstance().speakMessage("1 minute intermission starts now. Next group prepare to take off in one minute.   ");
+                    AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_SESSION);
+                    this.sendEmptyMessageDelayed(22,30000);
+                }
+                else if (interval == 22) {
+                    AppState.getInstance().speakMessage("30 seconds until next group start.");
+                    this.sendEmptyMessageDelayed(33,10000);
+                }
+                else if (interval == 33) {
+                    AppState.getInstance().speakMessage("20 seconds until next group start.");
+                    this.sendEmptyMessageDelayed(44,10000);
+                }
+                else if (interval == 44) {
+                    AppState.getInstance().speakMessage("10 seconds until next group start.");
+                    this.sendEmptyMessageDelayed(0,10000);
+                }
+
+                else if (interval == 0) {
+
+                    AppState.getInstance().speakMessage("Intermission is finished. Next group begins now. ");
+                    AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_SESSION);
+                    //double sessionSeconds = AppState.getInstance().sessionTime * 60000;
+                    //mSessionHandler.sendEmptyMessage((int) sessionSeconds);
+                    startTimer(rootView);
+
+
+                }
+                else {
+                    //send first voice alert 5 minute before race ends
+                    double dbl_interval = (double) interval;
+
+                    double mins = dbl_interval / 60000;
+
+                    AppState.getInstance().speakMessage(String.valueOf(mins) + " minute Group session started");
+                    int next_interval = interval - 360000;
+                    this.sendEmptyMessageDelayed(5, next_interval );
+
+
+
+                }
+
+
+            }
+
+        };
+
         LinearLayout layoutVoltage = (LinearLayout) rootView.findViewById(R.id.layoutVoltage);
 
         btnDecAdjust.setOnClickListener(new View.OnClickListener() {
@@ -265,6 +366,64 @@ public class RaceSetupFragment extends Fragment {
             }}
         );
 
+        btnDecSessionTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double time = AppState.getInstance().sessionTime;
+                double new_time = time;
+                if (time > 1 && time <= 10 )
+                {
+                    new_time = time - 1;
+                }
+                AppState.getInstance().changeSessionTime(new_time);
+            }
+        });
+
+        btnIncSessionTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double time = AppState.getInstance().sessionTime;
+                double new_time = time;
+                if (time > 1 && time < 10 )
+                {
+                    new_time = time + 1;
+                }
+                AppState.getInstance().changeSessionTime(new_time);
+            }}
+        );
+
+        btnStartSession.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (isSessionStarted == false) {
+                    isSessionStarted = true;
+                    startTimer(rootView);
+                }
+
+
+
+
+            }}
+        );
+
+
+
+        btnEndSession.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final TextView txtTimer = (TextView) rootView.findViewById(R.id.txtTimer);
+                if (isSessionStarted == true)
+                {
+                    isSessionStarted = false;
+                    mSessionHandler.removeCallbacksAndMessages(null);
+                    timer.cancel();
+                    timer = null;
+                    txtTimer.setText("cancelled");
+                }
+            }}
+        );
+
         chkLiPoMonitor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -317,6 +476,9 @@ public class RaceSetupFragment extends Fragment {
         TextView txtRaceTime = (TextView) rootView.findViewById(R.id.txtRaceTime);
         txtRaceTime.setText(Double.toString(AppState.getInstance().timedRaceTime) + " min.");
 
+        TextView txtSessionTime = (TextView) rootView.findViewById(R.id.txtSessionTime);
+        txtSessionTime.setText(Double.toString(AppState.getInstance().sessionTime) + " min.");
+
         TextView txtAdjustmentConst = (TextView) rootView.findViewById(R.id.txtAdjustmentConst);
         txtAdjustmentConst.setText(Integer.toString(AppState.getInstance().batteryAdjustmentConst));
     }
@@ -368,6 +530,34 @@ public class RaceSetupFragment extends Fragment {
     private void updateBatteryVoltageText(View rootView) {
         TextView txtVoltage = (TextView) rootView.findViewById(R.id.txtVoltage);
         txtVoltage.setText(String.format("%.2f", AppState.getInstance().batteryVoltage) + "V");
+
+    }
+
+    private void startTimer(View rootView) {
+        {
+            final TextView txtTimer = (TextView) rootView.findViewById(R.id.txtTimer);
+
+            double sessionSeconds = AppState.getInstance().sessionTime * 60000;
+            int timerSeconds = (int) sessionSeconds;
+            mSessionHandler.sendEmptyMessage((int) sessionSeconds);
+
+
+            timer = new CountDownTimer(timerSeconds, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    long minutes = millisUntilFinished / 1000 / 60;
+                    long seconds = millisUntilFinished - (minutes * 60000);
+                    txtTimer.setText(millisUntilFinished / 1000 / 60 + ":" + String.format("%02d", seconds / 1000));
+                    //here you can have your logic to set text to edittext
+                }
+
+                public void onFinish() {
+                    txtTimer.setText("done!");
+                }
+
+            }.start();
+
+        }
 
     }
 }

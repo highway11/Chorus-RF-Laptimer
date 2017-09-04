@@ -30,6 +30,7 @@ public class AppState {
     public static final int DURATION_PREPARE = 80;
     public static final int TONE_GO = ToneGenerator.TONE_DTMF_D;
     public static final int DURATION_GO = 600;
+    public static final int DURATION_SESSION = 1200;
     public static final int TONE_LAP = ToneGenerator.TONE_DTMF_S;
     public static final int DURATION_LAP = 400;
     public static final int MIN_TIME_BEFORE_RACE_TO_SPEAK = 5; //seconds, don't speak "Prepare" message if less time is set
@@ -63,6 +64,7 @@ public class AppState {
     public boolean shouldSpeakLapTimes = true;
     public boolean isTimedRace = false;
     public double timedRaceTime = 2;
+    public double sessionTime = 10;
     public boolean shouldSpeakMessages = true;
     public boolean shouldSkipFirstLap = true;
     public boolean wereDevicesConfigured = false;
@@ -77,6 +79,7 @@ public class AppState {
     public int batteryAdjustmentConst = 1;
     public boolean isLiPoMonitorEnabled = true;
     public boolean isConnected = false;
+
 
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
@@ -608,6 +611,17 @@ public class AppState {
             timedRaceTime = time;
             emitEvent(DataAction.TimedRaceTime);
             AppPreferences.save(AppPreferences.TIMED_RACE_TIME);
+        }
+    }
+
+    public void changeSessionTime(double time) {
+        if (time < 0) {
+            return;
+        }
+        if (sessionTime != time) {
+            sessionTime = time;
+            emitEvent(DataAction.SessionTime);
+            AppPreferences.save(AppPreferences.SESSION_TIME);
         }
     }
 
