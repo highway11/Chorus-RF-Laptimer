@@ -679,7 +679,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
             case CONTROL_GET_VOLTAGE: //get battery voltage
                 voltage = readVoltage();
                 //only send this command to the Arduino with voltage monitor
-                //addToSendQueue(SEND_VOLTAGE);
+                addToSendQueue(SEND_VOLTAGE);
                 break;
             case CONTROL_DATA_REQUEST: // request all data
                 addToSendQueue(SEND_ALL_DEVICE_STATE);
@@ -922,4 +922,4 @@ uint16_t readVoltage() {
     voltageA = voltageA/VOLTAGE_READS; // average of RSSI_READS readings
     return voltageA;
 }
->>>>>>> 0ee354f134642dee495544cea91707ad7f2d1bec
+
